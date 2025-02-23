@@ -3,9 +3,11 @@ import pytz
 import yaml
 
 from dotenv import load_dotenv
-from smolagents import CodeAgent, HfApiModel, tool
-from tools.final_answer import FinalAnswerTool
 from Gradio_UI import GradioUI
+from smolagents import CodeAgent, HfApiModel, tool, AgentImage
+from tools.final_answer import FinalAnswerTool
+from tools.visit_webpage import VisitWebPageTool
+from tools.web_search import DuckDuckGoSearchTool
 
 
 @tool 
@@ -37,6 +39,10 @@ def get_current_time_in_timezone(timezone: str) -> str:
 
 
 final_answer = FinalAnswerTool()
+web_search = DuckDuckGoSearchTool()
+visit_webpage = VisitWebPageTool()
+
+
 load_dotenv()
 
 model = HfApiModel(
@@ -52,7 +58,7 @@ with open("prompts.yaml") as stream:
 
 agent = CodeAgent(
     model=model, 
-    tools=[final_answer],
+    tools=[final_answer, web_search, visit_webpage],
     max_steps=6, 
     verbosity_level=1, 
     grammar=None, 
@@ -61,6 +67,8 @@ agent = CodeAgent(
     description=None, 
     prompt_templates=prompt_templates,
 )
+
+image_agent = AgentImage()
 
 
 if __name__ == '__main__':
